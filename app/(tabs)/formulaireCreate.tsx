@@ -3,7 +3,9 @@ import { View, TextInput, Text } from "react-native";
 import myFormStyles from "../styles/formCreateStyles";
 
 export default function MyForm() {
-  const [inputText, setInputText] = useState("");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
 
   return (
     <View style={myFormStyles.container}>
@@ -14,8 +16,8 @@ export default function MyForm() {
         style={myFormStyles.input}
         placeholder="Entrez le nom de l'oeuvre"
         placeholderTextColor="#aaa"
-        value={inputText}
-        onChangeText={setInputText}
+        value={title}
+        onChangeText={setTitle}
       />
 
       <Text style={myFormStyles.label}>Catégorie d'oeuvre :</Text>
@@ -23,8 +25,8 @@ export default function MyForm() {
         style={myFormStyles.input}
         placeholder="Entrez la catégorie"
         placeholderTextColor="#aaa"
-        value={inputText}
-        onChangeText={setInputText}
+        value={category}
+        onChangeText={setCategory}
       />
 
       <Text style={myFormStyles.label}>Description de l'oeuvre :</Text>
@@ -32,9 +34,9 @@ export default function MyForm() {
         style={myFormStyles.descriptionInput}
         placeholder="Entrez la description"
         placeholderTextColor="#aaa"
-        value={inputText}
+        value={description}
         multiline={true}
-        onChangeText={setInputText}
+        onChangeText={setDescription}
       />
 
       <Text style={myFormStyles.labelCover}>Cover</Text>
