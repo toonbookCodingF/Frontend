@@ -1,37 +1,51 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { QuillEditor, QuillToolbar } from 'react-native-cn-quill';
-
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 
 export default function App() {
-  const editorRef = useRef();
+  const [text, setText] = useState('');
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Mon Éditeur</Text>
+      {/* Ferme le clavier quand on clique en dehors */}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Titre Roman</Text>
 
-        {/* Éditeur Quill */}
-        <QuillEditor
-          ref={editorRef}
-          style={styles.editor}
-          placeholder="Écris ici..."
-        />
+          <TouchableOpacity style={styles.addChapterButton}>
+            <Text style={styles.addChapterText}>Ajouter un chapitre</Text>
+          </TouchableOpacity>
 
-        {/* Barre d'outils */}
-        <QuillToolbar
-          editor={editorRef}
-          options={[
-            ['bold', 'italic', 'underline'],
-            [{ header: [1, 2, 3, false] }],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            [{ align: [] }]
-          ]}
-        />
-      </View>
+          <Text style={styles.inputLabel}>Nom du chapitre</Text>
+
+          {/* Zone de texte */}
+          <TextInput
+            style={styles.textInput}
+            placeholder="Écris ton texte ici..."
+            placeholderTextColor="#aaa"
+            multiline
+            value={text}
+            onChangeText={setText}
+          />
+
+          {/* Bouton de sauvegarde */}
+          <TouchableOpacity style={styles.saveButton} onPress={() => console.log('Texte sauvegardé:', text)}>
+            <Text style={styles.saveButtonText}>Sauvegarder</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
@@ -52,10 +66,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  editor: {
-    flex: 1,
-    backgroundColor: '#fff',
+  addChapterButton: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#950d82',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderRadius: 8,
-    padding: 10,
+  },
+  addChapterText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  inputLabel: {
+    color: '#fff',
+    fontSize: 16,
+    marginTop: 20,
+  },
+  textInput: {
+    backgroundColor: '#fff',
+    color: '#000',
+    borderRadius: 8,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    height: 400,
+    textAlignVertical: 'top',
+  },
+  saveButton: {
+    backgroundColor: '#950d82',
+    paddingVertical: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
