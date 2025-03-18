@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Image, StyleSheet, FlatList, Dimensions, Text } from 'react-native';
-
+import { View, Image, StyleSheet, FlatList, Dimensions, Text,  Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 // Type pour chaque roman
 type Book = {
   id: string;
@@ -32,11 +32,17 @@ const books: Book[] = [
 ];
 
 const LectureBoard: React.FC = () => {
+
+  const router = useRouter();
+
+  const goToOeuvrePage =() =>{
+    router.push('../screens/OeuvrePage')
+  }
   const renderItem = ({ item }: { item: Book }) => (
-    <View style={styles.card}>
+    <Pressable onPress={goToOeuvrePage} style={styles.card}>
       <Image source={item.image} style={styles.image} resizeMode="cover" />
       <Text style={styles.title}>{item.title}</Text>
-    </View>
+    </Pressable>
   );
 
   return (
