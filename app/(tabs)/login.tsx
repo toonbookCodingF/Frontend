@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import styles from "../styles/loginStyles";
+import * as login from "../screens/login";
+
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
+  login.authService.login({email, password})
+  };
 
   return (
     <View style={styles.container}>
@@ -28,7 +33,7 @@ export default function LoginForm() {
         placeholderTextColor="white"
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Connexion")}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
 
@@ -41,5 +46,3 @@ export default function LoginForm() {
     </View>
   );
 }
-
-
