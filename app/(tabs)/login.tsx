@@ -1,14 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import styles from "../styles/loginStyles";
 import * as login from "../screens/login";
-
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  login.authService.login({email, password})
+
+  const handleLogin = () => {
+    login.authService
+      .login({ email, password })
+      .then(() => {
+        Alert.alert("Connexion réussie !");
+      })
+      .catch((error) => {
+        Alert.alert("Erreur de connexion", error.message);
+      });
   };
 
   return (
@@ -24,6 +31,7 @@ export default function LoginForm() {
         style={styles.input}
         placeholderTextColor="white"
       />
+
       <TextInput
         placeholder="Mot de passe"
         value={password}
@@ -38,7 +46,7 @@ export default function LoginForm() {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <Text style={styles.linkText}>Pas encore de compte?</Text>
+        <Text style={styles.linkText}>Pas encore de compte ?</Text>
         <Text style={styles.linkText}>Mot de passe oublié</Text>
       </View>
 
