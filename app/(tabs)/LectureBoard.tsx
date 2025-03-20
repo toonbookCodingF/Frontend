@@ -4,10 +4,19 @@ import { useRouter } from 'expo-router';
 
 // Type pour chaque roman
 type Book = {
-  id: string | number; // Adapté en cas d'ID numérique
-  cover: string;
+  id: string | number;
   title: string;
+  image: any; // Pour require()
 };
+
+// Tableau local des covers
+const localCovers: any[] = [
+  require('../../assets/images/imgCoverRoman/CoversRoman1.jpeg'),
+  require('../../assets/images/imgCoverRoman/CoversRoman2.jpg'),
+  require('../../assets/images/imgCoverRoman/CoversRoman3.jpeg'),
+  require('../../assets/images/imgCoverRoman/CoversRoman4.jpeg'),
+  // Tu peux en rajouter d'autres si nécessaire
+];
 
 const LectureBoard: React.FC = () => {
   const router = useRouter();
@@ -22,7 +31,7 @@ const LectureBoard: React.FC = () => {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const token = 'votre_token_ici'; // Remplace-le par ton vrai token
+      const token = 'votre_token_ici'; // Remplace avec ton vrai token
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -37,11 +46,11 @@ const LectureBoard: React.FC = () => {
 
         const data = await response.json();
 
-        // On adapte les données pour les utiliser dans notre FlatList
-        const formattedBooks = data.map((book: any) => ({
+        // Associer chaque titre à une image locale
+        const formattedBooks: Book[] = data.map((book: any, index: number) => ({
           id: book.id,
           title: book.title,
-          cover: `http://localhost:3000${book.cover}`, // Ajout de l'URL complète si nécessaire
+          image: localCovers[index % localCovers.length], // Boucle sur les covers si plus de livres que d'images
         }));
 
         setBooks(formattedBooks);
@@ -57,7 +66,7 @@ const LectureBoard: React.FC = () => {
 
   const renderItem = ({ item }: { item: Book }) => (
     <Pressable onPress={goToOeuvrePage} style={styles.card}>
-      <Image source={{ uri: item.cover }} style={styles.image} resizeMode="cover" />
+      <Image source={item.image} style={styles.image} resizeMode="cover" />
       <Text style={styles.title}>{item.title}</Text>
     </Pressable>
   );
