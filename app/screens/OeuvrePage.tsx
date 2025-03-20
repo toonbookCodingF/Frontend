@@ -1,11 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const App: React.FC = () => {
+  const router = useRouter();
+
+  const goToParagraphs = () => {
+    router.push('../paragraphs');
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Oeuvre Page !</Text>
-    </View>
+    <Pressable onPress={goToParagraphs} style={styles.container}>
+      <Text style={styles.text}>
+        Page avec liste des chapitres du roman choisi en cours de dev !
+        cliquer ici pour acceder aux roman pour la lecture
+      </Text>
+    </Pressable>
   );
 };
 

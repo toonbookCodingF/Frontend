@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { View, TextInput, Text } from "react-native";
+import { View, TextInput, Text, Pressable } from "react-native";
 import myFormStyles from "../styles/formCreateStyles";
+import { useRouter } from 'expo-router';
 
 export default function MyForm() {
+
+  const router = useRouter(); 
+
+  const goToCreateRoman =() =>{
+    router.push('/create')
+  }
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
@@ -41,8 +48,10 @@ export default function MyForm() {
 
       <Text style={myFormStyles.labelCover}>Cover</Text>
       <Text style={myFormStyles.buttonUpload}>Upload</Text>
+      <Pressable onPress={goToCreateRoman}>
+        <Text style={myFormStyles.buttonSave}>Save</Text>
+      </Pressable>
 
-      <Text style={myFormStyles.buttonSave}>Save</Text>
     </View>
   );
 }

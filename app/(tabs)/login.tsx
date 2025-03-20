@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import styles from "../styles/loginStyles";
-
+import { authService } from "../screens/login";
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      await authService.login({ email, password });
+      Alert.alert("Succès", "Connexion réussie !");
+    } catch (error) {
+      Alert.alert("Erreur", "Identifiants invalides. Veuillez réessayer.");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -28,7 +37,7 @@ export default function LoginForm() {
         placeholderTextColor="white"
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => console.log("Connexion")}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
 
@@ -41,5 +50,3 @@ export default function LoginForm() {
     </View>
   );
 }
-
-
