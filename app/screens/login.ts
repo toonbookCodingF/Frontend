@@ -1,64 +1,69 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import styles from "../styles/loginStyles";
-import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-const API_URL = Constants.expoConfig?.extra?.apiUrl
-const defaultConfig = {
-  headers: {
-      'Content-Type': 'application/json',
-  },
-  credentials: 'include' as const,
-};
-
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Une erreur est survenue');
-  }
-  return response.json();
-};
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 
 export interface LoginCredentials {
-  email: string;
-  password: string;
+    email: string;
+    password: string;
 }
 
 export interface AuthResponse {
-  token: string;
-  user: {
-      id: number;
-      email: string;
-      // autres informations utilisateur
-  };
+    token: string;
+    user: {
+        id: number;
+        email: string;
+    };
+}
+
+/**
+ * Fonction pour gérer les requêtes API avec gestion automatique du token.
+ */
+async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
+    const token = await AsyncStorage.getItem("userToken");
+
+    const headers: HeadersInit = {
+        "Content-Type": "application/json",
+        ...options.headers, // Permet d'ajouter des headers personnalisés
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`http://localhost:3000${endpoint}`, {
+        ...options,
+        headers,
+        credentials: "include", // Équivalent de `withCredentials: true`
+    });
+
+    if (response.status === 401) {
+        // Token expiré ou invalide
+        await AsyncStorage.removeItem("userToken");
+        console.warn("Token expiré, utilisateur déconnecté.");
+    }
+
+    return response;
 }
 
 export const authService = {
     // Login
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         try {
-            // Construire l'URL avec les paramètres de requête
-            const queryParams = new URLSearchParams({
-                email: credentials.email,
-                password: credentials.password
+            const response = await apiFetch("/api/users/login", {
+                method: "POST",
+                body: JSON.stringify(credentials),
+
             });
 
-            const response = await fetch(`${API_URL}/api/users/login?${queryParams}`, {
-                ...defaultConfig,
-                method: 'GET',
-            });
+            if (!response.ok) {
+                throw new Error("Échec de la connexion");
+            }
 
-            const data = await handleResponse(response);
-            const { token, user } = data;
-            
-            // Stocker le token
-            await AsyncStorage.setItem('userToken', token);
-            
-            return { token, user };
+            const data: AuthResponse = await response.json();
+            await AsyncStorage.setItem("userToken", data.token);
+
+            return data;
         } catch (error) {
-            console.error('Erreur de login:', error);
+            console.error("Erreur de login:", error);
             throw error;
         }
     },
@@ -66,20 +71,10 @@ export const authService = {
     // Logout
     async logout(): Promise<void> {
         try {
-            const token = await AsyncStorage.getItem('userToken');
-            const response = await fetch(`${API_URL}/api/users/logout`, {
-                ...defaultConfig,
-                method: 'POST',
-                headers: {
-                    ...defaultConfig.headers,
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            await handleResponse(response);
-            await AsyncStorage.removeItem('userToken');
+            await apiFetch("/api/users/logout", { method: "POST" });
+            await AsyncStorage.removeItem("userToken");
         } catch (error) {
-            console.error('Erreur de logout:', error);
+            console.error("Erreur de logout:", error);
             throw error;
         }
     },
@@ -87,20 +82,12 @@ export const authService = {
     // Vérifier si l'utilisateur est connecté
     async isAuthenticated(): Promise<boolean> {
         try {
-            const token = await AsyncStorage.getItem('userToken');
+            const token = await AsyncStorage.getItem("userToken");
             if (!token) return false;
 
-            const response = await fetch(`${API_URL}/api/users/me`, {
-                ...defaultConfig,
-                method: 'GET',
-                headers: {
-                    ...defaultConfig.headers,
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+            const response = await apiFetch("/api/users/me", { method: "GET" });
 
-            await handleResponse(response);
-            return true;
+            return response.ok;
         } catch (error) {
             return false;
         }
@@ -108,23 +95,6 @@ export const authService = {
 
     // Récupérer le token
     async getToken(): Promise<string | null> {
-        return await AsyncStorage.getItem('userToken');
+        return await AsyncStorage.getItem("userToken");
     },
-
-    // Fonction utilitaire pour faire des requêtes authentifiées
-    async authenticatedFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
-        const token = await AsyncStorage.getItem('userToken');
-        
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            ...defaultConfig,
-            ...options,
-            headers: {
-                ...defaultConfig.headers,
-                ...options.headers,
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-
-        return handleResponse(response);
-    }
-}; 
+};
