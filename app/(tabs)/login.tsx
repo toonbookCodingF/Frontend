@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import styles from "../styles/loginStyles";
-import * as login from "../screens/login";
+
+import { authService } from "../screens/login";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    login.authService
-      .login({ email, password })
-      .then(() => {
-        Alert.alert("Connexion réussie !");
-      })
-      .catch((error) => {
-        Alert.alert("Erreur de connexion", error.message);
-      });
+  const handleLogin = async () => {
+    try {
+      await authService.login({ email, password });
+      Alert.alert("Succès", "Connexion réussie !");
+    } catch (error) {
+      Alert.alert("Erreur", "Identifiants invalides. Veuillez réessayer.");
+    }
   };
 
   return (

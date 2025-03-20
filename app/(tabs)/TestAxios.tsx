@@ -16,7 +16,7 @@ const TestFetch = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/books/getAll');
+        const res = await fetch('http://localhost:3000/api/books');
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
