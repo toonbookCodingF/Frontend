@@ -6,16 +6,16 @@ import { useRouter } from 'expo-router';
 type Book = {
   id: string | number;
   title: string;
-  image: any; // Pour require()
+  description: string;
+  cover: string;
+  image: any;
 };
 
-// Tableau local des covers
 const localCovers: any[] = [
   require('../../assets/images/imgCoverRoman/CoversRoman1.jpeg'),
   require('../../assets/images/imgCoverRoman/CoversRoman2.jpg'),
   require('../../assets/images/imgCoverRoman/CoversRoman3.jpeg'),
   require('../../assets/images/imgCoverRoman/CoversRoman4.jpeg'),
-  // Tu peux en rajouter d'autres si nécessaire
 ];
 
 const LectureBoard: React.FC = () => {
@@ -25,8 +25,16 @@ const LectureBoard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
-  const goToOeuvrePage = () => {
-    router.push('../screens/OeuvrePage');
+  const goToOeuvrePage = (book: Book) => {
+    router.push({
+      pathname: '../screens/OeuvrePage',
+      params: {
+        id: book.id.toString(),
+        title: book.title,
+        description: book.description,
+        cover: book.cover,
+      },
+    });
   };
 
   useEffect(() => {
@@ -46,11 +54,12 @@ const LectureBoard: React.FC = () => {
 
         const data = await response.json();
 
-        // Associer chaque titre à une image locale
         const formattedBooks: Book[] = data.map((book: any, index: number) => ({
           id: book.id,
           title: book.title,
-          image: localCovers[index % localCovers.length], // Boucle sur les covers si plus de livres que d'images
+          description: book.description,
+          cover: `http://localhost:3000${book.cover}`, // Lien complet pour l'image
+          image: localCovers[index % localCovers.length],
         }));
 
         setBooks(formattedBooks);
@@ -65,7 +74,7 @@ const LectureBoard: React.FC = () => {
   }, []);
 
   const renderItem = ({ item }: { item: Book }) => (
-    <Pressable onPress={goToOeuvrePage} style={styles.card}>
+    <Pressable onPress={() => goToOeuvrePage(item)} style={styles.card}>
       <Image source={item.image} style={styles.image} resizeMode="cover" />
       <Text style={styles.title}>{item.title}</Text>
     </Pressable>
