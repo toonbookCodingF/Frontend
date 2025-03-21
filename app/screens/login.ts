@@ -25,10 +25,6 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
         ...options.headers, // Permet d'ajouter des headers personnalisés
     };
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
     const response = await fetch(`http://10.160.33.160:3000${endpoint}`, {
         ...options,
         headers,

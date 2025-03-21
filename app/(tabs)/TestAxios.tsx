@@ -1,29 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 
-type Book = {
-  id: number;
+// Définir le type des livres (seulement le titre et la couverture ici)
+interface Book {
   title: string;
-  description: string;
   cover: string;
-};
+}
 
-const TestFetch = () => {
+const BookList: React.FC = () => {
+  // État pour stocker les livres récupérés
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchBooks = async () => {
+      const token = 'votre_token_ici'; // Remplacez par votre token
+
+      // En-têtes de la requête avec le token
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+
       try {
-        const res = await fetch('http://localhost:3000/api/books/getAll');
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status}`);
+        const response = await fetch('http://localhost:3000/api/books', { headers });
+
+        if (!response.ok) {
+          throw new Error('Erreur de récupération des livres');
         }
-        const data = await res.json();
+
+        const data: Book[] = await response.json();
         setBooks(data);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Une erreur inconnue est survenue');
       } finally {
         setLoading(false);
       }
@@ -32,72 +41,22 @@ const TestFetch = () => {
     fetchBooks();
   }, []);
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Erreur : {error}</Text>
-      </View>
-    );
-  }
+  if (loading) return <p>Chargement des livres...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <FlatList
-      data={books}
-      keyExtractor={(item) => item.id.toString()}
-      contentContainerStyle={styles.listContainer}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Image
-            source={{ uri: item.cover }}
-            style={styles.image}
-            resizeMode="cover"
-          />
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
-      )}
-    />
+    <div>
+      <h1>Liste des livres</h1>
+      <ul>
+        {books.map((book, index) => (
+          <li key={index}>
+            <h2>{book.title}</h2>
+            <img src={book.cover} alt={book.title} width="100" />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-  },
-  listContainer: {
-    padding: 16,
-  },
-  card: {
-    backgroundColor: '#f8f8f8',
-    padding: 16,
-    marginBottom: 16,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  description: {
-    marginTop: 8,
-    fontSize: 14,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    marginTop: 10,
-    borderRadius: 8,
-  },
-});
-
-export default TestFetch;
+export default BookList;
