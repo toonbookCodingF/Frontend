@@ -33,7 +33,7 @@ const OeuvrePage: React.FC = () => {
 
   const goToParagraphs = (chapterId: number, chapterTitle: string) => {
     router.push({
-      pathname: '../screens/paragraphs', // Lien vers la page de lecture
+      pathname: '../paragraphs', // Lien vers la page de lecture
       params: { 
         chapterId: chapterId.toString(),
         bookId: id?.toString(),
