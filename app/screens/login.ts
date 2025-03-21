@@ -25,7 +25,7 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
         ...options.headers, // Permet d'ajouter des headers personnalisés
     };
 
-    const response = await fetch(`http://localhost:3000${endpoint}`, {
+    const response = await fetch(`http://10.160.33.160:3000${endpoint}`, {
         ...options,
         headers,
         credentials: "include", // Équivalent de `withCredentials: true`
