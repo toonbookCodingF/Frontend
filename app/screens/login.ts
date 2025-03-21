@@ -29,7 +29,7 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`http://172.20.10.2:3000${endpoint}`, {
+    const response = await fetch(`http://10.160.33.160:3000${endpoint}`, {
         ...options,
         headers,
         credentials: "include", // Équivalent de `withCredentials: true`

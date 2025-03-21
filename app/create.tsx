@@ -37,7 +37,7 @@ export default function CreateChapterScreen() {
 
     try {
       // 1. Création du chapitre
-      const chapterResponse = await fetch("http://localhost:3000/api/chapters/create", {
+      const chapterResponse = await fetch("http://10.160.33.160:3000/api/chapters/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -59,7 +59,7 @@ export default function CreateChapterScreen() {
       if (!chapterId) throw new Error("ID du chapitre introuvable.");
 
       // ✅ 2. Création du contenu lié à ce chapitre
-      const contentResponse = await fetch("http://localhost:3000/api/book-content", {
+      const contentResponse = await fetch("http://10.160.33.160:3000/api/book-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
