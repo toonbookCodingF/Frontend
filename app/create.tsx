@@ -9,40 +9,119 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 
-export default function App() {
+export default function CreateChapterScreen() {
+  const { bookId } = useLocalSearchParams();
+
+  const [chapterTitle, setChapterTitle] = useState('');
   const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    console.log("bookId reçu :", bookId);
+
+    if (!bookId || isNaN(parseInt(bookId))) {
+      Alert.alert("Erreur", "ID du livre manquant ou invalide.");
+      return;
+    }
+
+    if (!chapterTitle || !text) {
+      Alert.alert('Champs requis', 'Merci de remplir tous les champs.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 1. Création du chapitre
+      const chapterResponse = await fetch("http://localhost:3000/api/chapters/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title: chapterTitle,
+          book_id: parseInt(bookId),
+          status: "published",
+          order: 1,
+        }),
+      });
+
+      const chapterData = await chapterResponse.json();
+
+      if (!chapterResponse.ok) {
+        throw new Error(chapterData.message || "Erreur lors de la création du chapitre");
+      }
+
+      const chapterId = chapterData.data?.id;
+      if (!chapterId) throw new Error("ID du chapitre introuvable.");
+
+      // ✅ 2. Création du contenu lié à ce chapitre
+      const contentResponse = await fetch("http://localhost:3000/api/book-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          content: text,
+          chapter_id: chapterId, // 👈 on utilise le vrai ID
+          order: 1,
+          image: null,
+          type: "text",
+        }),
+      });
+
+      const contentData = await contentResponse.json();
+
+      if (!contentResponse.ok) {
+        throw new Error(contentData.message || "Erreur lors de l’enregistrement du contenu");
+      }
+
+      Alert.alert("Succès", "Chapitre et contenu enregistrés !");
+      setChapterTitle('');
+      setText('');
+    } catch (error) {
+      console.error("Erreur:", error);
+      Alert.alert("Erreur", error.message || "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      {/* Ferme le clavier quand on clique en dehors */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.innerContainer}>
-          <Text style={styles.title}>Titre Roman</Text>
-
-          <TouchableOpacity style={styles.addChapterButton}>
-            <Text style={styles.addChapterText}>Ajouter un chapitre</Text>
-          </TouchableOpacity>
+          <Text style={styles.title}>Ajouter un chapitre</Text>
 
           <Text style={styles.inputLabel}>Nom du chapitre</Text>
-
-          {/* Zone de texte */}
           <TextInput
             style={styles.textInput}
+            placeholder="Ex: Chapitre 1 – L'aventure commence"
+            placeholderTextColor="#aaa"
+            value={chapterTitle}
+            onChangeText={setChapterTitle}
+          />
+
+          <Text style={styles.inputLabel}>Contenu du chapitre</Text>
+          <TextInput
+            style={[styles.textInput, { height: 400 }]}
             placeholder="Écris ton texte ici..."
             placeholderTextColor="#aaa"
             multiline
             value={text}
             onChangeText={setText}
+            textAlignVertical="top"
           />
 
-          {/* Bouton de sauvegarde */}
-          <TouchableOpacity style={styles.saveButton} onPress={() => console.log('Texte sauvegardé:', text)}>
-            <Text style={styles.saveButtonText}>Sauvegarder</Text>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={loading}>
+            <Text style={styles.saveButtonText}>
+              {loading ? "Enregistrement..." : "Sauvegarder"}
+            </Text>
           </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
@@ -66,17 +145,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  addChapterButton: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#950d82',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  addChapterText: {
-    color: '#fff',
-    fontSize: 16,
-  },
   inputLabel: {
     color: '#fff',
     fontSize: 16,
@@ -89,14 +157,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    height: 400,
-    textAlignVertical: 'top',
   },
   saveButton: {
     backgroundColor: '#950d82',
     paddingVertical: 15,
     borderRadius: 8,
-    marginTop: 20,
+    marginTop: 30,
     alignItems: 'center',
   },
   saveButtonText: {
