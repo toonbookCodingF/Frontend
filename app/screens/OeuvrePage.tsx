@@ -1,29 +1,63 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
 const OeuvrePage: React.FC = () => {
   const router = useRouter();
   const { cover, title, description, id } = useLocalSearchParams();
 
-  const chapters = [
-    { id: 1, title: 'Chapitre 1' },
-    { id: 2, title: 'Chapitre 2' },
-    { id: 3, title: 'Chapitre 3' },
-    { id: 4, title: 'Chapitre 4' },
-  ];
+  const [chapters, setChapters] = useState<any[]>([]);  // Stocker les chapitres récupérés
+  const [loading, setLoading] = useState(true);  // Gérer le chargement des données
+  const [error, setError] = useState<string | null>(null);  // Gérer les erreurs
+
+  useEffect(() => {
+    const fetchChapters = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/chapters/book/${id}`);
+        if (!response.ok) {
+          throw new Error('Impossible de récupérer les chapitres');
+        }
+        const data = await response.json();
+        setChapters(data);  // Mettre à jour les chapitres avec les données récupérées
+      } catch (err) {
+        setError('Erreur de récupération des chapitres');
+      } finally {
+        setLoading(false);  // Fin du chargement
+      }
+    };
+
+    if (id) {
+      fetchChapters();
+    }
+  }, [id]);  // Refait la requête si l'ID change
 
   const goToParagraphs = (chapterId: number, chapterTitle: string) => {
     router.push({
-      pathname: '../screens/ParagraphPage', // Lien vers ta page de lecture
+      pathname: '../screens/paragraphs', // Lien vers la page de lecture
       params: { 
         chapterId: chapterId.toString(),
-        bookId: id?.toString(), 
+        bookId: id?.toString(),
         chapterTitle,
         bookTitle: title?.toString()
       },
     });
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -46,18 +80,22 @@ const OeuvrePage: React.FC = () => {
         {/* Liste des chapitres */}
         <Text style={styles.chapterHeader}>Chapitres</Text>
 
-        {chapters.map((chapter) => (
-          <Pressable
-            key={chapter.id}
-            onPress={() => goToParagraphs(chapter.id, chapter.title)}
-            style={({ pressed }) => [
-              styles.chapterButton,
-              pressed && { opacity: 0.8 },
-            ]}
-          >
-            <Text style={styles.chapterText}>{chapter.title}</Text>
-          </Pressable>
-        ))}
+        {chapters.length > 0 ? (
+          chapters.map((chapter) => (
+            <Pressable
+              key={chapter.id}
+              onPress={() => goToParagraphs(chapter.id, chapter.title)}
+              style={({ pressed }) => [
+                styles.chapterButton,
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <Text style={styles.chapterText}>{chapter.title}</Text>
+            </Pressable>
+          ))
+        ) : (
+          <Text style={styles.noChapters}>Aucun chapitre disponible.</Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -117,6 +155,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  noChapters: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#A020F0',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
 
