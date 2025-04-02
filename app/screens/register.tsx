@@ -12,7 +12,7 @@ export default function MyForm() {
       <Text style={styles.title}>Inscription</Text>
 
       <TextInput
-              style={myFormStyles.input}
+              style={styles.input}
               placeholder="Nom d'utilisateur"
               placeholderTextColor="#aaa"
               value={nomUser}

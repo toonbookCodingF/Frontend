@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import styles from "../styles/loginStyles";
 import { authService } from "../screens/login";
+import{useRouter} from 'expo-router';
+
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const router = useRouter();
 
   const handleLogin = async () => {
     try {
@@ -42,7 +47,10 @@ export default function LoginForm() {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
+        <TouchableOpacity onPress={() => router.push('/screens/register')}>
         <Text style={styles.linkText}>Pas encore de compte?</Text>
+        </TouchableOpacity>
+
         <Text style={styles.linkText}>Mot de passe oublié</Text>
       </View>
 
