@@ -1,25 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
-import {useRouter} from "expo-router";
+import { useRouter } from 'expo-router';
 
-const BibliothequePage: React.FC = () => {
+const MenuCreation: React.FC = () => {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Ma Bibliothèque</Text>
+      <Text style={styles.header}>Menu de Création</Text>
 
-      <Pressable style={styles.card} onPress={() => router.push('/screens/menuCreation')}>
-        <Text style={styles.cardText}>📖 Mes créations</Text>
-        <Text style={styles.descriptionCardText}>Retrouver vos créations</Text>
+      <Pressable style={styles.card} onPress={() => router.push('/screens/testRedirection')}>
+        <Text style={styles.cardText}>✏️ Nouvelle création</Text>
+        <Text style={styles.descriptionCardText}>Commencer un nouveau projet</Text>
       </Pressable>
 
       <Pressable style={styles.card} onPress={() => router.push('/screens/testRedirection')}>
-        <Text style={styles.cardText}>📚 Mes lectures</Text>
+        <Text style={styles.cardText}>⏳ Créations en cours</Text>
+        <Text style={styles.descriptionCardText}>Reprendre là où vous vous êtes arrêté</Text>
       </Pressable>
 
       <Pressable style={styles.card} onPress={() => router.push('/screens/testRedirection')}>
-        <Text style={styles.cardText}>⭐ Mes favoris</Text>
+        <Text style={styles.cardText}>📥 Importer une œuvre</Text>
+        <Text style={styles.descriptionCardText}>Ajouter un fichier existant</Text>
       </Pressable>
     </View>
   );
@@ -59,9 +61,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  descriptionCardText:{
+  descriptionCardText: {
     textAlign: 'center',
+    color: '#666',
+    marginTop: 5,
   },
 });
 
-export default BibliothequePage;
+export default MenuCreation;
