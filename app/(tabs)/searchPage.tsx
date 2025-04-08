@@ -16,7 +16,7 @@ type Book = {
   id: string | number;
   title: string;
   description: string;
-  cover: string; // lien vers une image distante
+  cover: string; 
 };
 
 const SearchPage: React.FC = () => {
