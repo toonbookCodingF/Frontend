@@ -3,10 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import styles from "../styles/loginStyles";
 
 import { authService } from "../screens/login";
-
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const router = useRouter();
 
   const handleLogin = async () => {
     try {
@@ -45,7 +46,7 @@ export default function LoginForm() {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <Text style={styles.linkText}>Pas encore de compte ?</Text>
+        <Text style={styles.linkText}>Pas encore de compte?</Text>
         <Text style={styles.linkText}>Mot de passe oublié</Text>
       </View>
 

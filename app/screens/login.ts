@@ -25,10 +25,6 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
         ...options.headers, // Permet d'ajouter des headers personnalisés
     };
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
     const response = await fetch(`http://localhost:3000${endpoint}`, {
         ...options,
         headers,
@@ -54,14 +50,24 @@ export const authService = {
 
             });
 
-            if (!response.ok) {
-                throw new Error("Échec de la connexion");
-            }
+           const responseData = await response.json();
+           console.log("Réponse du serveur :", responseData);
 
-            const data: AuthResponse = await response.json();
-            await AsyncStorage.setItem("userToken", data.token);
+           // 🔥 Correction : Accéder au token dans `data`
+           const token = responseData.data?.token;
+           const user = {
+               id: responseData.data?.id,
+               email: responseData.data?.email
+           };
 
-            return data;
+           if (!token) {
+               throw new Error("Le backend n'a pas renvoyé de token.");
+           }
+
+           // 🔥 Vérification que le token est bien défini avant de l'enregistrer
+           await AsyncStorage.setItem("userToken", token);
+
+           return { token, user };
         } catch (error) {
             console.error("Erreur de login:", error);
             throw error;
