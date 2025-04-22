@@ -9,11 +9,10 @@ const HomePage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hello 👋</Text>
       <Text style={styles.subtitle}>Bienvenue sur la HomePage !</Text>
-
+ 
       <TouchableOpacity style={styles.button} onPress={handlePress}>
-        <Text style={styles.buttonText}>Clique moi</Text>
+        <Text style={styles.buttonText}></Text>
       </TouchableOpacity>
     </View>
   );

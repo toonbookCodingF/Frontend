@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import styles from "../styles/registerStyles";
+import { useRouter} from "expo-router";
 
 export default function MyForm() {
   const [nomUser, setNomUser] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const router= useRouter();
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Inscription</Text>
 
       <TextInput
-              style={myFormStyles.input}
+              style={styles.input}
               placeholder="Nom d'utilisateur"
               placeholderTextColor="#aaa"
               value={nomUser}
@@ -42,7 +45,9 @@ export default function MyForm() {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <Text style={styles.linkText}>Pas encore de compte?</Text>
+      <TouchableOpacity onPress={()=> router.push('../login')}>
+          <Text style={styles.linkText}>Se connecter</Text>     
+        </TouchableOpacity>
         <Text style={styles.linkText}>Mot de passe oublié</Text>
       </View>
 
