@@ -136,7 +136,7 @@ export default function MyForm() {
         description,
         cover: coverToSend,
         category_id: parseInt(category),
-        bookType_id: bookTypeRoman?.id || null, // ✅ le nom exact demandé
+        bookType_id: bookTypeRoman?.id || null, 
         user_id: 1,
         status: "draft",
       };

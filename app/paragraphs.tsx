@@ -14,7 +14,6 @@ const ParagraphScreen: React.FC = () => {
   useEffect(() => {
     const fetchParagraphs = async () => {
       try {
-        // Utiliser l'URL correcte pour récupérer les paragraphes
         const response = await fetch(`http://localhost:3000/api/book-content/chapter/${chapterId}`);
         
         if (!response.ok) {
