@@ -54,7 +54,7 @@ export default function MultiImageUploadScreen() {
     });
 
     try {
-      const response = await fetch('https://your-backend.com/upload-multiple', {
+      const response = await fetch('http://localhost:3000/api/book-content', {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -98,7 +98,7 @@ export default function MultiImageUploadScreen() {
 }
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: "#FF69B4", 
+    backgroundColor: "#FF69B4",
     padding: 15,
     borderRadius: 25, // Arrondi des boutons
     width: "100%",
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   imageRow: {
     flexDirection: "row",
-    flexWrap: "wrap", 
+    flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     width: 180, // Augmenté pour un format plus grand comme un webtoon
     height: 250, // Augmenté pour une meilleure visibilité
     marginRight: 10,
-    marginBottom: 10, 
+    marginBottom: 10,
     borderWidth: 2,
   },
   loading: {
