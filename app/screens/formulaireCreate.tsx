@@ -60,31 +60,35 @@ export default function MyForm() {
   }, []);
 
   useEffect(() => {
+    // 1. Ne rien faire tant que l'utilisateur n'a pas choisi de type
+    if (type === null) return;
+
     const fetchBookType = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/book-types");
-        const data = await response.json();
+        const json = await response.json();
 
-        // Ajuste le type en fonction du choix de l'utilisateur
-        const bookTypeName = type === 0 ? "roman" : "manwha"; // Si 0 -> roman, sinon manwha
+        // 2. Détermine le nom recherché en fonction du choix exact (0 ou 1)
+        const bookTypeName = type === 0 ? "roman" : "manwha";
 
-        const foundBookType = data.data?.find(
-          (type) => type.nameType?.toLowerCase() === bookTypeName
+        // 3. Utilise un nom de variable différent dans la find pour éviter la confusion
+        const found = json.data?.find((bt: any) =>
+          bt.nameType?.toLowerCase() === bookTypeName
         );
 
-        if (foundBookType) {
-          setBookType(foundBookType);
+        if (found) {
+          setBookType(found);
         } else {
-          console.warn(`${bookTypeName} non trouvé.`);
+          console.warn(`Type "${bookTypeName}" non trouvé dans book-types !`);
         }
       } catch (error) {
         console.error("Erreur chargement book-types :", error);
       }
     };
-    if (type !== null) {
-      fetchBookType();
-    }
-  }, [type]); // Le `useEffect` se déclenche chaque fois que `type` change
+
+    fetchBookType();
+  }, [type]);
+  // Le `useEffect` se déclenche chaque fois que `type` change
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
