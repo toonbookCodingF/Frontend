@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const NouvelleCreation: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Redirection réussie !</Text>
+      <Text style={styles.text}>...</Text>
       <Text style={styles.subtext}>En cours de développement</Text>
     </View>
   );

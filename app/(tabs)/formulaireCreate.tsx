@@ -14,6 +14,10 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import myFormStyles from "../styles/formCreateStyles";
+import { useSearchParams } from "expo-router";
+
+
+
 
 async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const token = await AsyncStorage.getItem("userToken");
@@ -41,6 +45,8 @@ export default function MyForm() {
   const [bookTypeRoman, setBookTypeRoman] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+
+  
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -152,7 +158,12 @@ export default function MyForm() {
       if (response.ok) {
         Alert.alert("Succès", "Livre enregistré !");
         const newBookId = result.data?.id;
-        router.push({ pathname: "/create", params: { bookId: newBookId } });
+
+        if(type===0){
+          router.push({ pathname: "/create", params: { bookId: newBookId } });
+        }else{
+          router.push({pathname: "/uplodeOeuvreGraph", params: { bookId: newBookId } })
+        }
       } else {
         Alert.alert("Erreur", result.message || "Erreur inconnue.");
       }
