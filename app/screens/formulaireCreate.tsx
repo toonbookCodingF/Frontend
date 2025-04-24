@@ -14,7 +14,6 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import myFormStyles from "../styles/formCreateStyles";
-import loginStyles from "../styles/loginStyles"; // pour réutiliser les boutons
 import { useSearchParams } from "expo-router";
 
 async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
@@ -179,19 +178,13 @@ export default function MyForm() {
 
   if (type === null) {
     return (
-      <View style={loginStyles.container}>
-        <Text style={loginStyles.title}>Choisissez le type d'œuvre</Text>
-        <Pressable
-          style={loginStyles.button}
-          onPress={() => setType(0)}
-        >
-          <Text style={loginStyles.buttonText}>Oeuvre Littéraire</Text>
+      <View style={myFormStyles.container}>
+        <Text style={myFormStyles.title}>Choisissez le type d'œuvre</Text>
+        <Pressable style={myFormStyles.buttonSave} onPress={() => setType(0)}>
+          <Text style={{ color: "white" }}>Oeuvre Littéraire</Text>
         </Pressable>
-        <Pressable
-          style={loginStyles.button}
-          onPress={() => setType(1)}
-        >
-          <Text style={loginStyles.buttonText}>Oeuvre Graphique</Text>
+        <Pressable style={myFormStyles.buttonSave} onPress={() => setType(1)}>
+          <Text style={{ color: "white" }}>Oeuvre Graphique</Text>
         </Pressable>
       </View>
     );
