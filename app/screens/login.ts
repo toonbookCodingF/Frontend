@@ -28,7 +28,7 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
     const response = await fetch(`http://localhost:3000${endpoint}`, {
         ...options,
         headers,
-        credentials: "include", // Équivalent de `withCredentials: true`
+        credentials: "include",
     });
 
     if (response.status === 401) {
@@ -41,7 +41,7 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
 }
 
 export const authService = {
-    // Login
+    
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
         try {
             const response = await apiFetch("/api/users/login", {
@@ -64,7 +64,7 @@ export const authService = {
                throw new Error("Le backend n'a pas renvoyé de token.");
            }
 
-           // 🔥 Vérification que le token est bien défini avant de l'enregistrer
+           
            await AsyncStorage.setItem("userToken", token);
 
            return { token, user };
@@ -85,7 +85,7 @@ export const authService = {
         }
     },
 
-    // Vérifier si l'utilisateur est connecté
+   
     async isAuthenticated(): Promise<boolean> {
         try {
             const token = await AsyncStorage.getItem("userToken");
@@ -99,7 +99,7 @@ export const authService = {
         }
     },
 
-    // Récupérer le token
+    
     async getToken(): Promise<string | null> {
         return await AsyncStorage.getItem("userToken");
     },

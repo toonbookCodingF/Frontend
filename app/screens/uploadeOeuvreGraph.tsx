@@ -8,12 +8,34 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  const token = await AsyncStorage.getItem("userToken");
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+
+  return fetch(`http://localhost:3000${endpoint}`, {
+    ...options,
+    headers,
+  });
+}
+
 
 export default function MultiImageUploadScreen() {
+  const { bookId } = useLocalSearchParams();
+  const [chapterTitle, setChapterTitle] = useState('');
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+
 
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -40,6 +62,16 @@ export default function MultiImageUploadScreen() {
 
     setUploading(true);
 
+    const response = await apiFetch("/api/chapters/create", {
+      method: "POST",
+      body: JSON.stringify({
+        title: chapterTitle,
+        book_id: parseInt(bookId),
+        status: "published",
+        order: 1,
+      }),
+    });
+
     const formData = new FormData();
 
     images.forEach((uri, index) => {
@@ -54,7 +86,7 @@ export default function MultiImageUploadScreen() {
     });
 
     try {
-      const response = await fetch('http://localhost:3000/api/book-content', {
+      const response = await apiFetch('/api/bookcontents', {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -80,6 +112,16 @@ export default function MultiImageUploadScreen() {
 
   return (
     <View style={styles.container}>
+    <Text style={styles.title}>Ajouter un chapitre</Text>
+    
+              <Text style={styles.inputLabel}>Nom du chapitre</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Ex: Chapitre 1 – L'aventure commence"
+                placeholderTextColor="#aaa"
+                value={chapterTitle}
+                onChangeText={setChapterTitle}
+              />
       <Text style={styles.title}>Upload votre oeuvre graphique</Text>
       <Button title="Choisir des images" onPress={pickImages} />
       <ScrollView horizontal style={styles.scroll}>
@@ -142,5 +184,18 @@ const styles = StyleSheet.create({
   },
   loading: {
     marginTop: 20,
+  },
+  inputLabel: {
+    color: '#fff',
+    fontSize: 16,
+    marginTop: 20,
+  },
+  textInput: {
+    backgroundColor: '#fff',
+    color: '#000',
+    borderRadius: 8,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
 });

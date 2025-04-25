@@ -14,7 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import myFormStyles from "../styles/formCreateStyles";
-import { useSearchParams } from "expo-router";
+import { createBook} from "../../components/BookService";
 
 async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const token = await AsyncStorage.getItem("userToken");
@@ -65,15 +65,16 @@ export default function MyForm() {
 
     const fetchBookType = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/book-types");
+        const response = await fetch("http://localhost:3000/api/booktypes");
         const json = await response.json();
+        console.log(json)
 
         // 2. Détermine le nom recherché en fonction du choix exact (0 ou 1)
-        const bookTypeName = type === 0 ? "roman" : "manwha";
+        const bookTypeName = type === 0 ? "roman" : "webtoon";
 
         // 3. Utilise un nom de variable différent dans la find pour éviter la confusion
         const found = json.data?.find((bt: any) =>
-          bt.nameType?.toLowerCase() === bookTypeName
+          bt.nametype?.toLowerCase() === bookTypeName
         );
 
         if (found) {
@@ -85,6 +86,7 @@ export default function MyForm() {
         console.error("Erreur chargement book-types :", error);
       }
     };
+  
 
     fetchBookType();
   }, [type]);
@@ -143,8 +145,9 @@ export default function MyForm() {
     try {
       const coverToSend =
         cover || "https://via.placeholder.com/300x400.png?text=Couverture";
-
-      const body = {
+      
+      const newBook = await createBook(
+        {
         title,
         description,
         cover: coverToSend,
@@ -152,28 +155,17 @@ export default function MyForm() {
         bookType_id: bookType?.id || null, // Envoi du bon `bookType_id` basé sur le type sélectionné
         user_id: 1,
         status: "draft",
-      };
+        },
+        apiFetch 
+      );
 
-      const response = await apiFetch("/api/books", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-
-      const result = await response.json();
-      console.log("Réponse backend :", result);
-
-      if (response.ok) {
-        Alert.alert("Succès", "Livre enregistré !");
-        const newBookId = result.data?.id;
+      const newBookId = newBook.id;
 
         if (type === 0) {
           router.push({ pathname: "../create", params: { bookId: newBookId } });
         } else {
           router.push({ pathname: "/screens/uploadeOeuvreGraph", params: { bookId: newBookId } });
         }
-      } else {
-        Alert.alert("Erreur", result.message || "Erreur inconnue.");
-      }
     } catch (error) {
       console.error("Erreur POST book :", error);
       Alert.alert("Erreur", "Une erreur est survenue.");

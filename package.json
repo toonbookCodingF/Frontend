@@ -11,9 +11,30 @@
     "test": "jest --watchAll",
     "lint": "expo lint"
   },
-  "jest": {
-    "preset": "jest-expo"
-  },
+ "jest": {
+  "preset": "jest-expo",
+  "testEnvironment": "node",
+  "testMatch": [
+    "**/__tests__/**/*.test.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[jt]s?(x)"
+  ],
+  "transformIgnorePatterns": [
+    "node_modules/(?!((jest-)?react-native|@react-native|@react-navigation|expo(nent)?|@expo(nent)?/.*|react-clone-referenced-element|@expo-google-fonts/.*|@unimodules/.*|sentry-expo|native-base|@react-native-picker|@react-native-async-storage))"
+  ],
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "json",
+    "node"
+  ],
+  "globals": {
+    "ts-jest": {
+      "tsconfig": "tsconfig.json"
+    }
+  }
+},
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "^2.1.2",
@@ -55,11 +76,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@testing-library/react-native": "^13.2.0",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-test-renderer": "^18.3.0",
-    "jest": "^29.2.1",
+    "eslint-plugin-testing-library": "^7.1.1",
+    "jest": "^29.7.0",
     "jest-expo": "~52.0.3",
+    "jest-fetch-mock": "^3.0.3",
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },

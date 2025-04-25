@@ -12,6 +12,24 @@ import {
   Alert,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { createChapter, createBookContent } from "../components/ChapterService";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  const token = await AsyncStorage.getItem("userToken");
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+
+  return fetch(`http://localhost:3000${endpoint}`, {
+    ...options,
+    headers,
+  });
+}
+
 
 export default function CreateChapterScreen() {
   const { bookId } = useLocalSearchParams();
@@ -36,54 +54,26 @@ export default function CreateChapterScreen() {
     setLoading(true);
 
     try {
-      // 1. Création du chapitre
-      const chapterResponse = await fetch("http://localhost:3000/api/chapters/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          title: chapterTitle,
-          book_id: parseInt(bookId),
-          status: "published",
-          order: 1,
-        }),
-      });
-
-      const chapterData = await chapterResponse.json();
-
-      if (!chapterResponse.ok) {
-        throw new Error(chapterData.message || "Erreur lors de la création du chapitre");
-      }
-
-      const chapterId = chapterData.data?.id;
-      if (!chapterId) throw new Error("ID du chapitre introuvable.");
-
-      // ✅ 2. Création du contenu lié à ce chapitre
-      const contentResponse = await fetch("http://localhost:3000/api/book-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          content: text,
-          chapter_id: chapterId, // 👈 on utilise le vrai ID
-          order: 1,
-          image: null,
-          type: "text",
-        }),
-      });
-
-      const contentData = await contentResponse.json();
-
-      if (!contentResponse.ok) {
-        throw new Error(contentData.message || "Erreur lors de l’enregistrement du contenu");
-      }
-
+      const chapterId = await createChapter({
+        title: chapterTitle,
+        book_id: parseInt(bookId),
+        status: "published",
+        order: 1,
+      },
+      apiFetch);
+  
+      await createBookContent({
+        content: text,
+        chapter_id: chapterId,
+        order: 1,
+        image: null,
+        type: "text"
+      },
+      apiFetch);
+  
       Alert.alert("Succès", "Chapitre et contenu enregistrés !");
       setChapterTitle('');
       setText('');
-    } catch (error) {
-      console.error("Erreur:", error);
-      Alert.alert("Erreur", error.message || "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+export async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  const token = await AsyncStorage.getItem("userToken");
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    Authorization: token ? `Bearer ${token}` : "",
+  };
+
+  return fetch(`http://localhost:3000${endpoint}`, {
+    ...options,
+    headers,
+  });
+}
 
 const OeuvrePage: React.FC = () => {
   const router = useRouter();
@@ -13,23 +30,23 @@ const OeuvrePage: React.FC = () => {
   useEffect(() => {
     const fetchChapters = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/chapters/book/${id}`);
+        const response = await apiFetch(`/api/chapters/book/${id}`);
         if (!response.ok) {
           throw new Error('Impossible de récupérer les chapitres');
         }
         const data = await response.json();
-        setChapters(data);  // Mettre à jour les chapitres avec les données récupérées
+        setChapters(data);
       } catch (err) {
         setError('Erreur de récupération des chapitres');
       } finally {
-        setLoading(false);  // Fin du chargement
+        setLoading(false);
       }
     };
 
     if (id) {
       fetchChapters();
     }
-  }, [id]);  // Refait la requête si l'ID change
+  }, [id]);
 
   const goToParagraphs = (chapterId: number, chapterTitle: string) => {
     router.push({
