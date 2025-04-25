@@ -9,7 +9,7 @@ const MenuCreation: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Menu de Création</Text>
 
-      <Pressable style={styles.card} onPress={() => router.push('../formulaireCreate')}>
+      <Pressable style={styles.card} onPress={() => router.push('./formulaireCreate')}>
         <Text style={styles.cardText}>✏️ Nouvelle création</Text>
         <Text style={styles.descriptionCardText}>Commencer un nouveau projet</Text>
       </Pressable>
@@ -19,8 +19,8 @@ const MenuCreation: React.FC = () => {
         <Text style={styles.descriptionCardText}>Reprendre là où vous vous êtes arrêté</Text>
       </Pressable>
 
-      <Pressable style={styles.card} onPress={() => router.push('/screens/testRedirection')}>
-        <Text style={styles.cardText}>📥 Importer une œuvre</Text>
+      <Pressable style={styles.card} onPress={() => router.push('/screens/uploadeOeuvreGraph')}>
+        <Text style={styles.cardText}>📥 Importer une œuvre graphique</Text>
         <Text style={styles.descriptionCardText}>Ajouter un fichier existant</Text>
       </Pressable>
     </View>

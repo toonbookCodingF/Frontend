@@ -14,6 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import myFormStyles from "../styles/formCreateStyles";
+import { useSearchParams } from "expo-router";
 
 async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const token = await AsyncStorage.getItem("userToken");
@@ -33,12 +34,13 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<Re
 export default function MyForm() {
   const router = useRouter();
 
+  const [type, setType] = useState<number | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [cover, setCover] = useState("");
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
-  const [bookTypeRoman, setBookTypeRoman] = useState(null);
+  const [bookType, setBookType] = useState(null); // Pour stocker le type du livre (roman ou manga)
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
@@ -58,24 +60,35 @@ export default function MyForm() {
   }, []);
 
   useEffect(() => {
+    // 1. Ne rien faire tant que l'utilisateur n'a pas choisi de type
+    if (type === null) return;
+
     const fetchBookType = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/book-types");
-        const data = await response.json();
-        const romanType = data.data?.find(
-          (type) => type.nameType?.toLowerCase() === "roman"
+        const json = await response.json();
+
+        // 2. Détermine le nom recherché en fonction du choix exact (0 ou 1)
+        const bookTypeName = type === 0 ? "roman" : "manwha";
+
+        // 3. Utilise un nom de variable différent dans la find pour éviter la confusion
+        const found = json.data?.find((bt: any) =>
+          bt.nameType?.toLowerCase() === bookTypeName
         );
-        if (romanType) {
-          setBookTypeRoman(romanType);
+
+        if (found) {
+          setBookType(found);
         } else {
-          console.warn("Type 'roman' non trouvé.");
+          console.warn(`Type "${bookTypeName}" non trouvé dans book-types !`);
         }
       } catch (error) {
         console.error("Erreur chargement book-types :", error);
       }
     };
+
     fetchBookType();
-  }, []);
+  }, [type]);
+  // Le `useEffect` se déclenche chaque fois que `type` change
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -122,8 +135,8 @@ export default function MyForm() {
   };
 
   const handleSubmit = async () => {
-    if (!title || !category) {
-      Alert.alert("Champs requis", "Veuillez remplir le titre et choisir une catégorie.");
+    if (!title || !category || type === null) {
+      Alert.alert("Champs requis", "Veuillez remplir tous les champs.");
       return;
     }
 
@@ -136,7 +149,7 @@ export default function MyForm() {
         description,
         cover: coverToSend,
         category_id: parseInt(category),
-        bookType_id: bookTypeRoman?.id || null, // ✅ le nom exact demandé
+        bookType_id: bookType?.id || null, // Envoi du bon `bookType_id` basé sur le type sélectionné
         user_id: 1,
         status: "draft",
       };
@@ -152,7 +165,12 @@ export default function MyForm() {
       if (response.ok) {
         Alert.alert("Succès", "Livre enregistré !");
         const newBookId = result.data?.id;
-        router.push({ pathname: "/create", params: { bookId: newBookId } });
+
+        if (type === 0) {
+          router.push({ pathname: "../create", params: { bookId: newBookId } });
+        } else {
+          router.push({ pathname: "/screens/uploadeOeuvreGraph", params: { bookId: newBookId } });
+        }
       } else {
         Alert.alert("Erreur", result.message || "Erreur inconnue.");
       }
@@ -161,6 +179,20 @@ export default function MyForm() {
       Alert.alert("Erreur", "Une erreur est survenue.");
     }
   };
+
+  if (type === null) {
+    return (
+      <View style={myFormStyles.container}>
+        <Text style={myFormStyles.title}>Choisissez le type d'œuvre</Text>
+        <Pressable style={myFormStyles.buttonSave} onPress={() => setType(0)}>
+          <Text style={{ color: "white" }}>Oeuvre Littéraire</Text>
+        </Pressable>
+        <Pressable style={myFormStyles.buttonSave} onPress={() => setType(1)}>
+          <Text style={{ color: "white" }}>Oeuvre Graphique</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={myFormStyles.container}>
@@ -189,7 +221,7 @@ export default function MyForm() {
             {categories.map((cat) => (
               <Picker.Item
                 key={cat.id}
-                label={cat.nameCategory}
+                label={cat.namecategory}
                 value={cat.id.toString()}
               />
             ))}
