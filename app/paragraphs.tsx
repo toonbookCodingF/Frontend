@@ -7,24 +7,24 @@ const ParagraphScreen: React.FC = () => {
   const router = useRouter();
   const { chapterId, bookId, chapterTitle, bookTitle } = useLocalSearchParams();
 
-  const [paragraphs, setParagraphs] = useState<any[]>([]);  // Liste des paragraphes du chapitre
-  const [loading, setLoading] = useState(true);  // Gérer l'état de chargement
-  const [error, setError] = useState<string | null>(null);  // Gérer les erreurs
+  const [paragraphs, setParagraphs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchParagraphs = async () => {
       try {
+        // Utiliser l'URL correcte pour récupérer les paragraphes
         const response = await fetch(`http://localhost:3000/api/book-content/chapter/${chapterId}`);
         
         if (!response.ok) {
-          // Gestion d'erreur détaillée
+
           throw new Error(`Erreur ${response.status}: Impossible de récupérer les paragraphes`);
         }
 
         const data = await response.json();
-        setParagraphs(data);  // Mettre à jour les paragraphes
+        setParagraphs(data);
       } catch (err: any) {
-        // Si c'est une erreur réseau, l'afficher clairement
         setError(err.message || 'Erreur inconnue lors de la récupération des paragraphes');
       } finally {
         setLoading(false);  // Fin du chargement
@@ -32,19 +32,17 @@ const ParagraphScreen: React.FC = () => {
     };
 
     if (chapterId) {
-      fetchParagraphs(); // Récupérer les paragraphes du chapitre
+      fetchParagraphs();
     }
-  }, [chapterId]);  // Refait la requête chaque fois que chapterId change
+  }, [chapterId]);
 
-  // Fonction pour retourner à la page précédente
   const goBack = () => {
     router.back();
   };
 
-  // Fonction pour gérer le clic sur le bouton des commentaires
   const goToComments = () => {
     router.push({
-      pathname: '/comments',  // Page des commentaires (modifier le chemin si nécessaire)
+      pathname: '/comments',
       params: { chapterId, bookId, chapterTitle, bookTitle },
     });
   };
@@ -99,14 +97,14 @@ const ParagraphScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#A020F0', // Fond violet
+    backgroundColor: '#A020F0',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#800080', // Fond violet foncé
+    backgroundColor: '#800080',
   },
   title: {
     color: 'white',
@@ -149,7 +147,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   commentButton: {
-    alignSelf: 'flex-end', // Bouton à droite du paragraphe
+    alignSelf: 'flex-end',
     marginTop: 10,
     padding: 10,
     backgroundColor: 'white',
