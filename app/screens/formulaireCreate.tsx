@@ -67,13 +67,14 @@ export default function MyForm() {
       try {
         const response = await fetch("http://localhost:3000/api/booktypes");
         const json = await response.json();
+        console.log(json)
 
         // 2. Détermine le nom recherché en fonction du choix exact (0 ou 1)
-        const bookTypeName = type === 0 ? "roman" : "manwha";
+        const bookTypeName = type === 0 ? "roman" : "webtoon";
 
         // 3. Utilise un nom de variable différent dans la find pour éviter la confusion
         const found = json.data?.find((bt: any) =>
-          bt.nameType?.toLowerCase() === bookTypeName
+          bt.nametype?.toLowerCase() === bookTypeName
         );
 
         if (found) {
